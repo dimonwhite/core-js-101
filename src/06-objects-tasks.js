@@ -117,35 +117,75 @@ function fromJSON(proto, json) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  result: '',
+
+  element(value) {
+    this.checkError(1);
+    const builder = Object.create(cssSelectorBuilder);
+    builder.i = 1;
+    builder.result = this.result + value;
+    return builder;
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    this.checkError(2);
+    const builder = Object.create(cssSelectorBuilder);
+    builder.i = 2;
+    builder.result = `${this.result}#${value}`;
+    return builder;
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    this.checkError(3);
+    const builder = Object.create(cssSelectorBuilder);
+    builder.i = 3;
+    builder.result = `${this.result}.${value}`;
+    return builder;
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    this.checkError(4);
+    const builder = Object.create(cssSelectorBuilder);
+    builder.i = 4;
+    builder.result = `${this.result}[${value}]`;
+    return builder;
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    this.checkError(5);
+    const builder = Object.create(cssSelectorBuilder);
+    builder.i = 5;
+    builder.result = `${this.result}:${value}`;
+    return builder;
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    this.checkError(6);
+    const builder = Object.create(cssSelectorBuilder);
+    builder.i = 6;
+    builder.result = `${this.result}::${value}`;
+    return builder;
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    const builder = Object.create(cssSelectorBuilder);
+    builder.result = `${selector1.result} ${combinator} ${selector2.result}`;
+    return builder;
+  },
+
+  stringify() {
+    return this.result;
+  },
+
+  checkError(error) {
+    if (this.i > error) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    if (this.i === error && [1, 2, 6].includes(error)) {
+      throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    }
   },
 };
-
 
 module.exports = {
   Rectangle,
